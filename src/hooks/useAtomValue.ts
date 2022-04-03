@@ -3,17 +3,23 @@ import { useEffect, useState } from "react";
 import atoms from "../atoms/atoms";
 import DefaultValue from "../types/DefaultValue";
 
-function useAtomValue<T = unknown>(
+function useAtomValue<T>(
   atomId: string,
   defaultValue?: DefaultValue<T>
-): T {
+): [atom: T, mounted: boolean] {
   const atomRef = atoms.get<T>(atomId);
+  const [mounted, setMounted] = useState(atoms.isAtomMounted(atomId));
+  const [atom, setAtom] = useState<T>(atomRef.current);
 
   useEffect(() => {
+    if (mounted) {
+      return;
+    }
+    if (defaultValue === undefined) {
+      setMounted(true);
+      return;
+    }
     (async () => {
-      if (defaultValue === undefined) {
-        return;
-      }
       const value = await (defaultValue instanceof Function
         ? defaultValue()
         : defaultValue);
@@ -21,10 +27,13 @@ function useAtomValue<T = unknown>(
         atomRef.current = value;
         atoms.notify(atomId);
       }
+      setMounted(true);
     })();
   }, [atomId]);
 
-  const [atom, setAtom] = useState<T>(atomRef.current);
+  useEffect(() => {
+    atoms.setAtomMounted(atomId);
+  }, [mounted]);
 
   useEffect(() => {
     const clear = atoms.listenAtom(atomId, () => {
@@ -35,7 +44,7 @@ function useAtomValue<T = unknown>(
     };
   }, [atomId]);
 
-  return atom;
+  return [atom, mounted];
 }
 
 export default useAtomValue;

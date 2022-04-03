@@ -3,10 +3,12 @@ import { createRef, MutableRefObject } from "react";
 class Atoms {
   private atoms = new Map<string, MutableRefObject<unknown>>();
   private listeners = new Map<string, Array<() => void>>();
+  private mounted = new Map<string, boolean>();
 
-  public createAtom<T = unknown>(atomId: string): MutableRefObject<T | null> {
+  private createAtom<T = unknown>(atomId: string): MutableRefObject<T | null> {
     const atomRef = createRef<T>();
     this.atoms.set(atomId, atomRef);
+    this.mounted.set(atomId, false);
     return atomRef;
   }
 
@@ -20,6 +22,14 @@ class Atoms {
     if (listeners) {
       listeners.forEach((listener) => listener());
     }
+  }
+
+  public setAtomMounted(atomId: string): void {
+    this.mounted.set(atomId, true);
+  }
+
+  public isAtomMounted(atomId: string): boolean {
+    return this.mounted.get(atomId) ?? false;
   }
 
   public listenAtom(atomId: string, listener: () => void): () => void {
@@ -39,6 +49,7 @@ class Atoms {
   public clearAtom(atomId: string): void {
     this.atoms.delete(atomId);
     this.listeners.delete(atomId);
+    this.mounted.delete(atomId);
   }
 }
 
