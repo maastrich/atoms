@@ -32,7 +32,9 @@ function useAtomValue<T>(
   }, [atomId]);
 
   useEffect(() => {
-    atoms.setAtomMounted(atomId);
+    if (mounted) {
+      atoms.setAtomMounted(atomId);
+    }
   }, [mounted]);
 
   useEffect(() => {
