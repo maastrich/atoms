@@ -1,9 +1,11 @@
 import { createRef, MutableRefObject } from "react";
+import AtomState from "../types/AtomState";
 
 class Atoms {
   private atoms = new Map<string, MutableRefObject<unknown>>();
-  private listeners = new Map<string, Array<() => void>>();
+  private listeners = new Map<string, Array<(state: AtomState) => void>>();
   private mounted = new Map<string, boolean>();
+  private mounting = new Map<string, MutableRefObject<boolean>>();
 
   private createAtom<T = unknown>(atomId: string): MutableRefObject<T | null> {
     const atomRef = createRef<T>();
@@ -17,22 +19,35 @@ class Atoms {
       this.createAtom<T>(atomId)) as MutableRefObject<T>;
   }
 
-  public notify(atomId: string): void {
+  public notify(atomId: string, state: AtomState): void {
     const listeners = this.listeners.get(atomId);
     if (listeners) {
-      listeners.forEach((listener) => listener());
+      listeners.forEach((listener) => listener(state));
     }
   }
 
-  public setAtomMounted(atomId: string): void {
-    this.mounted.set(atomId, true);
+  private createMountingRef(atomId: string): MutableRefObject<boolean | null> {
+    const mountingRef = createRef<boolean>() as MutableRefObject<boolean>;
+    mountingRef.current = false;
+    this.mounting.set(atomId, mountingRef);
+    return mountingRef;
+  }
+
+  public getMountingRef(atomId: string): MutableRefObject<boolean> {
+    return (this.mounting.get(atomId) || this.createMountingRef(atomId)) as MutableRefObject<boolean>;
   }
 
   public isAtomMounted(atomId: string): boolean {
     return this.mounted.get(atomId) ?? false;
   }
 
-  public listenAtom(atomId: string, listener: () => void): () => void {
+  public setAtomMounted(atomId: string): void {
+    this.mounted.set(atomId, true);
+  }
+
+  public listenAtom(atomId: string, listener: (
+    state: AtomState
+  ) => void): () => void {
     const listeners = this.listeners.get(atomId);
     this.listeners.set(atomId, [...(listeners || []), listener]);
     return () => {
@@ -48,8 +63,9 @@ class Atoms {
 
   public clearAtom(atomId: string): void {
     this.atoms.delete(atomId);
-    this.listeners.delete(atomId);
     this.mounted.delete(atomId);
+    this.mounting.delete(atomId);
+    this.listeners.delete(atomId);
   }
 }
 
