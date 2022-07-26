@@ -9,10 +9,10 @@ function useSetAtom<T = unknown>(
   const atomRef = atoms.get<T>(atomId);
   return useCallback((value: T | ((prev: T) => T)) => {
     if (atomRef.current !== value) {
-      if (value instanceof Function) {
+      if (!(atomRef.current instanceof Function) && value instanceof Function) {
         atomRef.current = value(atomRef.current);
       } else {
-        atomRef.current = value;
+        atomRef.current = value as T;
       }
       atoms.notify(atomId, AtomState.Updated);
     }
