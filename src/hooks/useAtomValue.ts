@@ -1,22 +1,32 @@
 import { useEffect, useState } from "react";
 
 import atoms from "../atoms/atoms";
+import AtomState from "../types/AtomState";
 import DefaultValue from "../types/DefaultValue";
+import useAtomIsMounting from "./useAtomIsMounting";
+import useAtomRef from "./useAtomRef";
 
 function useAtomValue<T>(
   atomId: string,
   defaultValue?: DefaultValue<T>
 ): [atom: T, mounted: boolean] {
-  const atomRef = atoms.get<T>(atomId);
+  const atomRef = useAtomRef<T>(atomId);
+  const mounting = useAtomIsMounting(atomId);
   const [mounted, setMounted] = useState(atoms.isAtomMounted(atomId));
   const [atom, setAtom] = useState<T>(atomRef.current);
 
   useEffect(() => {
-    if (mounted) {
+    if (mounting.current || mounted) {
       return;
     }
+    mounting.current = true;
     if (defaultValue === undefined) {
-      setMounted(true);
+      atoms.notify(atomId, AtomState.Mounted);
+      return;
+    }
+    if (typeof defaultValue !== "function") {
+      atomRef.current = defaultValue;
+      atoms.notify(atomId, AtomState.Mounted);
       return;
     }
     (async () => {
@@ -25,7 +35,7 @@ function useAtomValue<T>(
         : defaultValue);
       if (atomRef.current !== value) {
         atomRef.current = value;
-        atoms.notify(atomId);
+        atoms.notify(atomId, AtomState.Mounted);
       }
       setMounted(true);
     })();
@@ -38,8 +48,13 @@ function useAtomValue<T>(
   }, [mounted]);
 
   useEffect(() => {
-    const clear = atoms.listenAtom(atomId, () => {
-      setAtom(atomRef.current);
+    const clear = atoms.listenAtom(atomId, (state: AtomState) => {
+      if (state === AtomState.Mounted) {
+        setMounted(true);
+      }
+      if (state !== AtomState.Mounting) {
+        setAtom(atomRef.current);
+      }
     });
     return () => {
       clear();

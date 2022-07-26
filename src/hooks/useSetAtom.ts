@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import atoms from "../atoms/atoms";
+import AtomState from "../types/AtomState";
 
 function useSetAtom<T = unknown>(
   atomId: string
@@ -13,7 +14,7 @@ function useSetAtom<T = unknown>(
       } else {
         atomRef.current = value;
       }
-      atoms.notify(atomId);
+      atoms.notify(atomId, AtomState.Updated);
     }
   }, []);
 }
