@@ -13,29 +13,43 @@
     "atoms",
     "atom",
     "state",
+    "store",
+    "reducer",
     "states"
   ],
   "scripts": {
-    "prettier": "prettier -c .",
-    "eslint": "eslint src",
-    "codestyle": "yarn unimported; yarn eslint --max-warnings=0 ; yarn prettier",
+    "test": "jest",
     "prebuild": "rm -rf dist",
     "build": "tsc --build",
     "prewatch": "rm -rf dist",
     "watch": "tsc --watch",
-    "prepack": "yarn build"
+    "prepack": "yarn build",
+    "prettier": "prettier -c .",
+    "eslint": "eslint src",
+    "codestyle": "yarn unimported; yarn eslint --max-warnings=0 ; yarn prettier"
   },
   "peerDependencies": {
-    "react": "^18"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^3.2.0",
-    "@types/react": "^18",
-    "@typescript-eslint/eslint-plugin": "^5.17.0",
-    "@typescript-eslint/parser": "^5.17.0",
-    "eslint": "^8.12.0",
-    "prettier": "^2.6.2",
-    "typescript": "^4.6.3",
-    "unimported": "^1.19.1"
+    "@testing-library/react": "^13.3.0",
+    "@trivago/prettier-plugin-sort-imports": "^3.3.0",
+    "@types/jest": "^28.1.6",
+    "@types/react": "^18.0.15",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "eslint": "^8.20.0",
+    "jest": "^28.1.3",
+    "jest-environment-jsdom": "^28.1.3",
+    "jsdom": "^20.0.0",
+    "navigator": "^1.0.1",
+    "prettier": "^2.7.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "ts-jest": "^28.0.7",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4",
+    "unimported": "^1.21.0"
   }
 }

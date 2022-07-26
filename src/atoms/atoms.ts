@@ -1,4 +1,5 @@
 import { createRef, MutableRefObject } from "react";
+
 import AtomState from "../types/AtomState";
 
 class Atoms {
@@ -14,9 +15,13 @@ class Atoms {
     return atomRef;
   }
 
-  public get<T = unknown>(atomId: string): MutableRefObject<T> {
-    return (this.atoms.get(atomId) ??
-      this.createAtom<T>(atomId)) as MutableRefObject<T>;
+  public get<T = unknown>(
+    atomId: string,
+    { ensure = true }: { ensure?: boolean } = {}
+  ): MutableRefObject<T> {
+    return (
+      this.atoms.get(atomId) ?? ensure ? this.createAtom<T>(atomId) : undefined
+    ) as MutableRefObject<T>;
   }
 
   public notify(atomId: string, state: AtomState): void {
@@ -34,7 +39,8 @@ class Atoms {
   }
 
   public getMountingRef(atomId: string): MutableRefObject<boolean> {
-    return (this.mounting.get(atomId) || this.createMountingRef(atomId)) as MutableRefObject<boolean>;
+    return (this.mounting.get(atomId) ||
+      this.createMountingRef(atomId)) as MutableRefObject<boolean>;
   }
 
   public isAtomMounted(atomId: string): boolean {
@@ -45,9 +51,10 @@ class Atoms {
     this.mounted.set(atomId, true);
   }
 
-  public listenAtom(atomId: string, listener: (
-    state: AtomState
-  ) => void): () => void {
+  public listenAtom(
+    atomId: string,
+    listener: (state: AtomState) => void
+  ): () => void {
     const listeners = this.listeners.get(atomId);
     this.listeners.set(atomId, [...(listeners || []), listener]);
     return () => {

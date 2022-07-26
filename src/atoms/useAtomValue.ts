@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import atoms from "../atoms/atoms";
-import AtomState from "../types/AtomState";
-import DefaultValue from "../types/DefaultValue";
-import useAtomIsMounting from "./useAtomIsMounting";
+import { AtomState, DefaultValue } from "../types";
+
+import atoms from "./atoms";
+import useAtomIsMounting from "./useAtomIsMountingRef";
 import useAtomRef from "./useAtomRef";
 
 function useAtomValue<T>(
@@ -12,7 +12,7 @@ function useAtomValue<T>(
 ): [atom: T, mounted: boolean] {
   const atomRef = useAtomRef<T>(atomId);
   const mounting = useAtomIsMounting(atomId);
-  const [mounted, setMounted] = useState(atoms.isAtomMounted(atomId));
+  const [mounted, setMounted] = useState(atoms.isAtomMounted(atomId) ?? false);
   const [atom, setAtom] = useState<T>(atomRef.current);
 
   useEffect(() => {

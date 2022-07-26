@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import atoms from "../atoms/atoms";
+import atoms from "./atoms";
 
 function useClearAtom(atomId: string): () => void {
   return useCallback(() => {

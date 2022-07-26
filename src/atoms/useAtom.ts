@@ -1,5 +1,4 @@
-import Atom from "../types/Atom";
-import DefaultValue from "../types/DefaultValue";
+import { Atom, DefaultValue } from "../types";
 
 import useAtomValue from "./useAtomValue";
 import useClearAtom from "./useClearAtom";

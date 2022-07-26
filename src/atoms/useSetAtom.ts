@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 
-import atoms from "../atoms/atoms";
-import AtomState from "../types/AtomState";
+import { AtomState } from "../types";
+
+import atoms from "./atoms";
 
 function useSetAtom<T = unknown>(
   atomId: string
