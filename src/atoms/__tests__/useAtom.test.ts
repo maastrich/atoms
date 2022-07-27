@@ -1,7 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { act } from "react-dom/test-utils";
 
-import atoms from "../atoms";
 import useAtom from "../useAtom";
 
 describe("useAtom", () => {
@@ -22,6 +21,7 @@ describe("useAtom", () => {
 
   it("should update the atom", () => {
     const { result } = renderHook(() => useAtom("#test.atom"));
+    expect(result.current[0]).toBe(null); // before useEffects
     waitFor(() => {
       act(() => {
         result.current[1]("bar");
@@ -33,6 +33,8 @@ describe("useAtom", () => {
   it("should update the atom when it's “brother” is updated", () => {
     const { result: elder } = renderHook(() => useAtom("#test.atom", "bar"));
     const { result: benjamin } = renderHook(() => useAtom("#test.atom"));
+    expect(elder.current[0]).toBe(null); // before useEffects
+    expect(benjamin.current[0]).toBe(null); // before useEffects
     waitFor(() => {
       expect(elder.current[0]).toBe("bar");
       act(() => {
@@ -43,12 +45,14 @@ describe("useAtom", () => {
   });
 
   it("should clean the atom and be unset", () => {
-    const { result } = renderHook(() => useAtom("#test.atom"));
+    const { result } = renderHook(() => useAtom("#test.atom", "foo"));
+    expect(result.current[0]).toBe(null); // before useEffects
     waitFor(() => {
+      expect(result.current[0]).toBe("foo");
       act(() => {
         result.current[2]();
       });
-      expect(atoms.get("#test.atom", { ensure: false })).toBe(undefined);
+      expect(result.current[0]).toBe(null);
     });
   });
 });
