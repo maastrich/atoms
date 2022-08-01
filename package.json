@@ -1,6 +1,6 @@
 {
   "name": "@maastrich/atoms",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Exposes an alternative to React contexts",
   "main": "dist/atoms.js",
   "repository": "https://github.com/Maastrich/atoms.git",
